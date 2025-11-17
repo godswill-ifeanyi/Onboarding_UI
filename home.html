@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en" x-data="app()" x-init="init()" :class="dark ? 'dark' : ''" x-cloak>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>LearnersXP — Dashboard</title>
+
+  <!-- Enable class based dark mode before loading Tailwind -->
+  <script>
+    tailwind = {
+      config: {
+        darkMode: 'class',
+        theme: { extend: {} }
+      }
+    }
+  </script>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Alpine (deferred) -->
+  <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+  <style>
+    [x-cloak]{display:none!important}
+  </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen">
+
+  <!-- Mobile topbar -->
+  <header class="md:hidden flex items-center justify-between px-4 py-3 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+    <div class="text-lg font-semibold text-blue-600 dark:text-blue-400">LearnersXP</div>
+
+    <div class="flex items-center gap-3">
+      <!-- bell -->
+      <button @click="openNotifications = !openNotifications" class="relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+        <!-- bell svg -->
+        <svg class="w-6 h-6 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14V11a6 6 0 00-9.33-4.973"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 21a2 2 0 01-4 0"/></svg>
+        <span class="absolute top-1 right-1 block h-2 w-2 rounded-full bg-red-500"></span>
+      </button>
+
+      <!-- theme toggle -->
+      <button @click="toggleDark()" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+        <template x-if="dark">
+          <!-- sun -->
+          <svg class="w-5 h-5 text-yellow-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2M12 19v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/><circle cx="12" cy="12" r="3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </template>
+        <template x-if="!dark">
+          <!-- moon -->
+          <svg class="w-5 h-5 text-gray-700 dark:text-gray-200" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 118.646 3.646 7 7 0 0020.354 15.354z"/></svg>
+        </template>
+      </button>
+
+      <!-- avatar -->
+      <button @click="openProfile = true" class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold">
+        U
+      </button>
+    </div>
+  </header>
+
+  <!-- Desktop sidebar -->
+  <aside class="hidden md:flex md:flex-col md:w-64 md:h-screen md:fixed md:top-0 md:left-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
+    <div class="p-5 flex items-center justify-between">
+      <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">LearnersXP</div>
+      <!-- desktop icons (bell, theme, avatar) -->
+      <div class="flex items-center gap-2">
+        <!-- bell -->
+        <button @click="openNotifications = !openNotifications" class="relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+          <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14V11a6 6 0 00-9.33-4.973"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 21a2 2 0 01-4 0"/></svg>
+          <span class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500"></span>
+        </button>
+
+        <!-- theme -->
+        <button @click="toggleDark()" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+          <template x-if="dark">
+            <svg class="w-5 h-5 text-yellow-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2M12 19v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/><circle cx="12" cy="12" r="3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </template>
+          <template x-if="!dark">
+            <svg class="w-5 h-5 text-gray-700 dark:text-gray-200" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 118.646 3.646 7 7 0 0020.354 15.354z"/></svg>
+          </template>
+        </button>
+
+        <!-- avatar -->
+        <button @click="openProfile = true" class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold">U</button>
+      </div>
+    </div>
+
+    <nav class="px-4 py-3 space-y-2">
+      <button @click="navigate('home')" :class="activePage === 'home' ? 'bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-300' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'" class="w-full text-left px-3 py-2 rounded-md">🏠 Home</button>
+
+      <button @click="navigate('schedules')" :class="activePage === 'schedules' ? 'bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-300' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'" class="w-full text-left px-3 py-2 rounded-md">🗓️ Schedules</button>
+
+      <button @click="navigate('play')" :class="activePage === 'play' ? 'bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-300' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'" class="w-full text-left px-3 py-2 rounded-md">🎮 Play</button>
+
+      <button @click="navigate('chat')" :class="activePage === 'chat' ? 'bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-300' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'" class="w-full text-left px-3 py-2 rounded-md">💬 Chat</button>
+
+      <button @click="navigate('more')" :class="activePage === 'more' ? 'bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-300' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'" class="w-full text-left px-3 py-2 rounded-md">⋯ More</button>
+    </nav>
+  </aside>
+
+  <!-- Main -->
+  <main class="md:ml-64 p-4 md:p-6">
+    <!-- header for desktop (smaller, inside main) -->
+    <div class="hidden md:flex items-center justify-between mb-6">
+      <h1 class="text-2xl font-semibold">Dashboard</h1>
+      <div class="flex items-center gap-3">
+        <!-- small duplicates (optional) -->
+        <div class="text-sm text-gray-500 dark:text-gray-400">Welcome back</div>
+      </div>
+    </div>
+
+    <!-- Pages -->
+    <section x-show="activePage === 'home'" class="space-y-4">
+      <h2 class="text-3xl font-semibold">Home</h2>
+      <p class="text-gray-600 dark:text-gray-400">Welcome to LearnersXP — your hub for learning.</p>
+
+      <div class="grid gap-4 md:grid-cols-3 mt-6">
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">Upcoming: Intro to JavaScript — Tomorrow 9:00</div>
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">Leaderboard: #12</div>
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">Messages: none</div>
+      </div>
+    </section>
+
+    <section x-show="activePage === 'schedules'" class="space-y-4">
+      <h2 class="text-3xl font-semibold">Schedules</h2>
+      <p class="text-gray-600 dark:text-gray-400">Your scheduled sessions:</p>
+
+      <div class="space-y-4 mt-4">
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow flex justify-between items-start">
+          <div>
+            <h3 class="font-semibold">JavaScript — Fundamentals</h3>
+            <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">Wed Nov 12 • 09:00 — 10:30 • Instructor: Ada</div>
+            <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">Topics: variables, functions, DOM basics</p>
+          </div>
+          <div class="flex-shrink-0">
+            <button class="bg-blue-600 text-white px-3 py-1 rounded">Join</button>
+          </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow flex justify-between items-start">
+          <div>
+            <h3 class="font-semibold">Design Patterns in PHP</h3>
+            <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">Fri Nov 14 • 14:00 — 15:30 • Instructor: Chidi</div>
+            <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">Topics: Singleton, Repository</p>
+          </div>
+          <div class="flex-shrink-0">
+            <button class="bg-blue-600 text-white px-3 py-1 rounded">View</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section x-show="activePage === 'play'" class="space-y-4">
+      <h2 class="text-3xl font-semibold">Play</h2>
+      <p class="text-gray-600 dark:text-gray-400">Quizzes and interactive learning games.</p>
+    </section>
+
+    <section x-show="activePage === 'chat'" class="space-y-4">
+      <h2 class="text-3xl font-semibold">Chat</h2>
+      <p class="text-gray-600 dark:text-gray-400">Connect with learners.</p>
+    </section>
+
+    <section x-show="activePage === 'more'" class="space-y-4">
+      <h2 class="text-3xl font-semibold">More</h2>
+
+      <div class="space-y-3 mt-4">
+        <a class="block bg-white dark:bg-gray-800 p-4 rounded-lg shadow hover:bg-blue-50 dark:hover:bg-gray-700">🏆 Leaderboard</a>
+        <a class="block bg-white dark:bg-gray-800 p-4 rounded-lg shadow hover:bg-blue-50 dark:hover:bg-gray-700">❓ What Do You Want To Learn?</a>
+        <a class="block bg-white dark:bg-gray-800 p-4 rounded-lg shadow hover:bg-blue-50 dark:hover:bg-gray-700">🔁 Skill Exchange</a>
+        <a class="block bg-white dark:bg-gray-800 p-4 rounded-lg shadow hover:bg-blue-50 dark:hover:bg-gray-700">👤 Profile</a>
+        <a class="block bg-white dark:bg-gray-800 p-4 rounded-lg shadow hover:bg-blue-50 dark:hover:bg-gray-700">🛠 Support</a>
+        <a class="block bg-white dark:bg-gray-800 p-4 rounded-lg shadow hover:bg-red-50 dark:hover:bg-red-900 text-red-600 dark:text-red-400">🚪 Logout</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Notifications dropdown (simple) -->
+  <div x-show="openNotifications" @click.away="openNotifications = false" x-transition class="fixed right-4 top-16 md:top-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg w-80 z-50">
+    <div class="p-4">
+      <div class="font-semibold mb-2">Notifications</div>
+      <div class="text-sm text-gray-600 dark:text-gray-300">No new notifications</div>
+    </div>
+  </div>
+
+  <!-- Profile modal / dropdown -->
+  <div x-show="openProfile" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-6" x-transition:enter-end="opacity-100 translate-y-0"
+       x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-6"
+       class="fixed inset-0 z-50 flex items-end md:items-start justify-center md:justify-end" @click.self="openProfile = false">
+
+    <!-- mobile overlay -->
+    <div class="absolute inset-0 bg-black bg-opacity-50 md:hidden"></div>
+
+    <!-- content -->
+    <div class="relative w-full md:w-80 bg-white dark:bg-gray-800 rounded-t-2xl md:rounded-lg shadow-lg p-6">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xl font-semibold">U</div>
+          <div>
+            <div class="font-semibold">John Doe</div>
+            <div class="text-sm text-gray-500 dark:text-gray-400">john.doe@example.com</div>
+          </div>
+        </div>
+        <button @click="openProfile = false" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+          <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- editable fields -->
+      <div class="space-y-3">
+        <div>
+          <label class="text-sm block mb-1">Full name</label>
+          <input x-model="profile.name" class="w-full p-2 rounded-md bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none" />
+        </div>
+
+        <div>
+          <label class="text-sm block mb-1">Bio</label>
+          <textarea x-model="profile.bio" rows="3" class="w-full p-2 rounded-md bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none"></textarea>
+        </div>
+
+        <div class="flex gap-2">
+          <button @click="saveProfile()" class="flex-1 bg-blue-600 text-white py-2 rounded-md">Save</button>
+          <button @click="resetProfile()" class="flex-1 border border-gray-300 dark:border-gray-600 py-2 rounded-md">Reset</button>
+        </div>
+
+        <div x-show="saving" class="text-sm text-green-600">Saving...</div>
+        <div x-show="saved" class="text-sm text-green-400">Saved ✓</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile bottom nav -->
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 flex justify-around py-2 text-xs z-40">
+    <button @click="navigate('home')" :class="activePage === 'home' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-700 dark:text-gray-200' " class="flex flex-col items-center"><span>🏠</span><span>Home</span></button>
+    <button @click="navigate('schedules')" :class="activePage === 'schedules' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-700 dark:text-gray-200' " class="flex flex-col items-center"><span>🗓️</span><span>Schedules</span></button>
+    <button @click="navigate('play')" :class="activePage === 'play' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-700 dark:text-gray-200' " class="flex flex-col items-center"><span>🎮</span><span>Play</span></button>
+    <button @click="navigate('chat')" :class="activePage === 'chat' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-700 dark:text-gray-200' " class="flex flex-col items-center"><span>💬</span><span>Chat</span></button>
+    <button @click="navigate('more')" :class="activePage === 'more' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-700 dark:text-gray-200' " class="flex flex-col items-center"><span>⋯</span><span>More</span></button>
+  </nav>
+
+  <!-- Alpine app script -->
+  <script>
+    function app(){
+      return {
+        dark: false,
+        openProfile: false,
+        openNotifications: false,
+        activePage: 'home',
+        profile: { name: 'John Doe', bio: 'Web Learner & Gamer' },
+        saving: false,
+        saved: false,
+        init(){
+          // load theme
+          try {
+            const t = localStorage.getItem('lx_theme')
+            this.dark = t === null ? true : t === 'dark'
+          } catch(e){ this.dark = true }
+
+          // load profile if stored
+          try {
+            const p = localStorage.getItem('lx_profile')
+            if(p){ this.profile = JSON.parse(p) }
+          } catch(e){ /* ignore */ }
+
+          // show default page
+          this.navigate(this.activePage)
+        },
+        toggleDark(){
+          this.dark = !this.dark
+          try { localStorage.setItem('lx_theme', this.dark ? 'dark' : 'light') } catch(e){}
+        },
+        navigate(page){
+          this.activePage = page
+          // close mobile overlays
+          this.openProfile = false
+          this.openNotifications = false
+          // scroll top
+          window.scrollTo(0,0)
+        },
+        saveProfile(){
+          this.saving = true
+          this.saved = false
+          // fake save delay
+          setTimeout(()=> {
+            try { localStorage.setItem('lx_profile', JSON.stringify(this.profile)) } catch(e){}
+            this.saving = false
+            this.saved = true
+            setTimeout(()=> this.saved = false, 1800)
+          }, 900)
+        },
+        resetProfile(){
+          this.profile = { name: 'John Doe', bio: 'Web Learner & Gamer' }
+        }
+      }
+    }
+  </script>
+</body>
+</html>

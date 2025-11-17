@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" x-data="onboarding()">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LearnersXP</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  
+</head>
+
+<body class="bg-black text-white min-h-screen overflow-y-auto">
+  <div class="relative w-full min-h-screen overflow-hidden bg-gray-900" x-init="init()">
+
+    <!-- Backgrounds -->
+    <template x-for="(slide, index) in slides" :key="index">
+      <img x-show="screen === index + 1"
+           x-transition:enter="fade-slide-active"
+           x-transition:enter-start="fade-slide-enter"
+           x-transition:leave="fade-slide-active"
+           x-transition:leave-start="fade-slide-leave"
+           :src="slide.image"
+           class="absolute inset-0 w-full h-full object-cover" />
+    </template>
+
+    <!-- Overlay -->
+    <div class="absolute inset-0 bg-black/50"></div>
+
+    <!-- Content -->
+    <div class="relative z-10 flex flex-col justify-between min-h-screen p-6">
+      <!-- Progress Bars -->
+      <div class="flex justify-center mt-4 space-x-2 w-full">
+        <template x-for="(bar, index) in [1, 2, 3]" :key="index">
+          <div class="h-1 bg-white/30 rounded-full w-16 overflow-hidden">
+            <div class="h-1 bg-white rounded-full transition-all duration-300"
+                 :style="index + 1 === screen ? `width: ${progress}%` : (index + 1 < screen ? 'width: 100%' : 'width: 0%')">
+            </div>
+          </div>
+        </template>
+      </div>
+
+      <!-- Text -->
+      <div class="mt-2 sm:mt-32 space-y-3">
+        <template x-for="(slide, index) in slides" :key="index">
+          <div x-show="screen === index + 1"
+               x-transition:enter="transition ease-out duration-700 transform"
+               x-transition:enter-start="opacity-0 translate-y-5"
+               x-transition:enter-end="opacity-100 translate-y-0">
+            <h1 
+              class="font-bold leading-snug text-5xl sm:text-3xl md:text-4xl" 
+              x-text="slide.title">
+            </h1>
+            <p 
+              class="text-gray-200 text-2xl sm:text-base max-w-md" 
+              x-text="slide.desc">
+            </p>
+          </div>
+        </template>
+      </div>
+
+      <!-- Buttons -->
+      <div class="space-y-4 my-10 flex flex-col md:flex-row md:space-x-4 md:space-y-0">
+        <button class="w-48 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-xl transition">
+          Get started
+        </button>
+        <button class="w-48 bg-white/90 text-gray-900 font-semibold py-3 rounded-xl transition">
+          Log in
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function onboarding() {
+      return {
+        screen: 1,
+        progress: 0,
+        interval: null,
+        slides: [
+          {
+            title: "The Learner's Experience",
+            desc: "Get a new friend that knows about something you're insterested in learning.",
+            image: "./bg-image2.jpg"
+          },
+          {
+            title: "Peer-To-Peer Skill Exchange Platform",
+            desc: "Find the skills you need. Share the skills you have.",
+            image: "./bg-image1.jpg"
+          },
+          {
+            title: "Fun And Intellectual Games",
+            desc: "Play games to earn credits. Rank on the monthly top 10 Leaderboard.",
+            image: "./bg-image3.jpg"
+          }
+        ],
+        startProgress() {
+          this.progress = 0;
+          clearInterval(this.interval);
+          this.interval = setInterval(() => {
+            if (this.progress < 100) {
+              this.progress += 2;
+            } else {
+              clearInterval(this.interval);
+              this.nextScreen();
+            }
+          }, 100);
+        },
+        nextScreen() {
+          if (this.screen < this.slides.length) {
+            this.screen++;
+            this.startProgress();
+          } else {
+            this.screen = 1; // restart loop
+            this.startProgress();
+          }
+        },
+        init() {
+          this.startProgress();
+        }
+      };
+    }
+  </script>
+</body>
+</html>
